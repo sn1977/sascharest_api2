@@ -11,5 +11,14 @@ class Todo(models.Model):
         User,
         on_delete=models.CASCADE,
     )
+    
+    def time_passed(self):
+        return (datetime.date.today() - self.created_at ).days
+    
+        # other possibility for writing this function
+        # def time_passed(self):
+        #     today = datetime.date.today()
+        #     delta = today - self.created_at
+        #     return delta.days
 
     

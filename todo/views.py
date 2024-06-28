@@ -1,8 +1,10 @@
+from django.http import HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.models import User
 from rest_framework import permissions, viewsets
+from django.core import serializers
 
-from todo.serializers import TodoSerializer, UserSerializer
+from .serializers import TodoSerializer, UserSerializer
 from .models import Todo
 
 class TodoViewSet(viewsets.ModelViewSet):
@@ -13,6 +15,16 @@ class TodoViewSet(viewsets.ModelViewSet):
     serializer_class = TodoSerializer
     permission_classes = [] # permissions.IsAuthenticated
     
+    def create(self, request, *args, **kwargs):
+        todo = Todo.objects.create(
+            title = request.POST.get('title', ''),
+            description = request.POST.get('description', ''),
+            user = request.user
+        )
+        serialized_obj = serializers.serialize('json', [todo])
+        return HttpResponse(serialized_obj, content_type='application/json')
+    
 class UserViewSet(viewsets.ModelViewSet):
     queryset = User.objects.all()
     serializer_class = UserSerializer
+
